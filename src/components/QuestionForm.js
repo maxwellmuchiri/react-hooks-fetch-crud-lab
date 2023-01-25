@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 function QuestionForm(props) {
   const [formData, setFormData] = useState({
     prompt: "",
@@ -9,19 +8,36 @@ function QuestionForm(props) {
     answer4: "",
     correctIndex: 0,
   });
-
+  const sendData ={
+    prompt:'',
+    answers:[],
+    correctIndex:''
+  }
+  sendData.prompt=formData.prompt
+  sendData.answers.push(formData.answer1,formData.answer2,formData.answer3,formData.answer4)
+  sendData.correctIndex=formData.correctIndex;
   function handleChange(event) {
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
     });
   }
-
   function handleSubmit(event) {
     event.preventDefault();
+    fetch(props.API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sendData),
+    })
+    .then(resp=>resp.json())
+    .then(data=>{
+      const updatedQuestions = [...props.questions,data]
+      props.setQuestions(()=>updatedQuestions);
+    })
     console.log(formData);
   }
-
   return (
     <section>
       <h1>New Question</h1>
